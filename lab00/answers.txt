@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 1. mv
 2. chmod
 3. pwd
@@ -6,3 +7,10 @@
 6. ps
 7. kill
 8. diff
+=======
+1. grep -r
+2. ps
+3. kill
+4. diff
+5. ls -l
+>>>>>>> 5172dc2bb50ef6f8bd45dfc48f0bf17aeae4b5d2
