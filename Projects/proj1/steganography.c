@@ -6,10 +6,11 @@
 **
 ** AUTHOR:      Dan Garcia  -  University of California at Berkeley
 **              Copyright (C) Dan Garcia, 2020. All rights reserved.
-**				Justin Yokota - Starter Code
-**				YOUR NAME HERE
+**              Justin Yokota - Starter Code
+**				Omar Elgedawy
 **
-** DATE:        2020-08-23
+**
+** DATE:        2026-09-28
 **
 **************************************************************************/
 
@@ -21,13 +22,41 @@
 //Determines what color the cell at the given row/col should be. This should not affect Image, and should allocate space for a new Color.
 Color *evaluateOnePixel(Image *image, int row, int col)
 {
-	//YOUR CODE HERE
+	Color *color = malloc(sizeof(Color));
+	if(color == NULL)return NULL;
+	uint8_t b = image->image[row*image->cols+col]->B & 1;
+	color->R = b ? 255 : 0;
+	color->G = b ? 255 : 0;
+	color->B = b ? 255 : 0;
+	return color;
 }
 
 //Given an image, creates a new image extracting the LSB of the B channel.
 Image *steganography(Image *image)
 {
-	//YOUR CODE HERE
+	Image *newImage = malloc(sizeof(Image));
+	if(newImage == NULL)return NULL;
+	newImage->rows = image->rows;
+	newImage->cols = image->cols;
+	int total = newImage->rows*newImage->cols;
+	newImage->image = malloc(total*sizeof(Color*));
+	if(newImage->image == NULL){
+		free(newImage);
+		return NULL;
+	}
+	for(int i=0;i<newImage->rows;i++){
+		for(int j=0;j<newImage->cols;j++){
+			Color *p = evaluateOnePixel(image,i,j);
+			if(p==NULL){
+				for (int k = 0; k < i * newImage->cols + j; k++) free(newImage->image[k]);
+       			free(newImage->image);
+				free(newImage);
+				return NULL;
+			}
+			newImage->image[i*newImage->cols+j] = p;
+		}
+	}
+	return newImage;
 }
 
 /*
@@ -45,5 +74,25 @@ Make sure to free all memory before returning!
 */
 int main(int argc, char **argv)
 {
-	//YOUR CODE HERE
+	if(argc != 2){
+		printf("usage: %s filename\n", argv[0]);
+		printf("filename is an ASCII PPM file (type P3) with maximum value 255.\n");
+		exit(-1);
+	}
+	Image *image = readData(argv[1]);
+	fprintf(stderr, "rows=%u cols=%u\n", image->rows, image->cols);
+	if(image == NULL){
+	   fprintf(stderr, "Error reading image data from file %s\n", argv[1]);
+		exit(-1);
+	}
+	Image *secret = steganography(image);
+	if(secret == NULL){
+		printf("Error creating secret image\n");
+		freeImage(image);
+		exit(-1);
+	}
+	writeData(secret);
+	freeImage(image);
+	freeImage(secret);
+	return 0;
 }
