@@ -7,10 +7,10 @@
 ** AUTHOR:      Dan Garcia  -  University of California at Berkeley
 **              Copyright (C) Dan Garcia, 2020. All rights reserved.
 **              Justin Yokota - Starter Code
-**				YOUR NAME HERE
+**				Omar Elgedawy
 **
 **
-** DATE:        2020-08-15
+** DATE:        2026-09-28
 **
 **************************************************************************/
 
@@ -25,17 +25,50 @@
 //Make sure that you close the file with fclose before returning.
 Image *readData(char *filename) 
 {
-	//YOUR CODE HERE
+	FILE *fp = fopen(filename,"r");
+	if(fp == NULL)
+		return NULL;
+	char format[3];
+	int cols,rows,maxval;
+	fscanf(fp,"%s %d %d %d",format,&cols,&rows,&maxval);
+	Image *image = malloc(sizeof(Image));
+	image -> rows = rows;
+	image -> cols = cols;
+	int total = rows*cols;
+	image -> image = malloc(total*sizeof(Color*));
+	if(image->image == NULL){
+		free(image);
+		fclose(fp);
+		return NULL;
+	}
+	for(int i=0;i<total;i++){
+		Color *color = malloc(sizeof(Color));
+		fscanf(fp,"%3hhu %3hhu %3hhu",&color->R,&color->G,&color->B);
+		image -> image[i] = color;
+	}
+	fclose(fp);
+	return image;
 }
 
 //Given an image, prints to stdout (e.g. with printf) a .ppm P3 file with the image's data.
 void writeData(Image *image)
 {
-	//YOUR CODE HERE
+	printf("P3\n%u %u\n255\n", image->cols, image->rows);
+	for(int i=0;i<image->rows;i++){
+		for(int j=0;j<image->cols;j++){
+			Color *p = image->image[i*image->cols+j];
+			if(j>0)printf("   ");
+			printf("%3u %3u %3u",p->R,p->G,p->B);
+		}
+		printf("\n");
+	}
 }
 
 //Frees an image
 void freeImage(Image *image)
 {
-	//YOUR CODE HERE
+	int total = image->rows * image->cols;
+	for(int i=0;i<total;i++)free(image->image[i]);
+	free(image->image);
+	free(image);
 }
