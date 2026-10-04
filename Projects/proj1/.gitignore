@@ -258,3 +258,9 @@ steganography
 #You can comment these lines if you wish to push these, but be sure to delete all gifs and ppms when submitting to Gradescope
 studentOutputs/**/*.ppm
 *.gif
+*.o
+*.gif
+gameOfLife
+imageloader
+steganography
+studentOutputs/*/
